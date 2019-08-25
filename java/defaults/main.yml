@@ -1,0 +1,14 @@
+---
+# defaults file for java
+java_version: jdk-8u131-linux-x64
+java_src_file: "{{ java_version }}.tar.gz"
+download_url: "http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/{{ java_src_file }}"
+download_folder: /opt/java/src
+#java_name: "{{download_folder}}/{{java_version}}"
+java_archive: "{{download_folder}}/{{ java_src_file }}"
+java_env_file: "/opt/env.sh"
+java_home: /opt/java
+latestVersion: "{{ java_home }}/latestVersion"
+
+user: predator
+group: predator

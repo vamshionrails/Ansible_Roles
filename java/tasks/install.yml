@@ -1,0 +1,46 @@
+- block:  
+    - name: simulate long running op, allow to run for 45 sec, fire and forget
+      command: /bin/sleep 15
+      async: 45
+      poll: 0
+
+    - name: Download Java
+      #command: "wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u151-linux-x64.tar.gz
+      get_url:
+        url: "{{download_url}}"
+        dest: "{{java_archive}}"
+        force: no
+        headers: 'Cookie: oraclelicense=accept-securebackup-cookie --no-check-certificate'     
+
+
+
+       
+    - name: create java folder to extract
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ java_home }}/{{ java_version }}"
+    
+
+    - name: Unpack archive
+      unarchive:
+        src: "{{ java_archive }}"
+        dest: "{{ java_home }}/{{ java_version }}"
+        copy: no
+        extra_opts: [--strip-components=1]
+
+    - name: Create symbolic link 
+      file:
+        src: "{{java_home}}/{{ java_version }}"
+        dest: "{{ latestVersion }}"
+        state: link
+
+    - name: Set/Configure JAVA_HOME in environment variables 
+      shell: "echo 'export JAVA_HOME={{latestVersion}}\nexport PATH=$JAVA_HOME/bin:$PATH' > {{java_env_file}}"
+
+    - name: Source the environment and check the java path
+      shell: "source {{ java_env_file }}; echo 'java path' : `which java`"
+      register: ps
+    
+    - debug: msg="{{ ps.stdout }}"
