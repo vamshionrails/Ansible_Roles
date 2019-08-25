@@ -12,16 +12,12 @@
         force: no
         headers: 'Cookie: oraclelicense=accept-securebackup-cookie --no-check-certificate'     
 
-
-
-       
     - name: create java folder to extract
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ java_home }}/{{ java_version }}"
-    
 
     - name: Unpack archive
       unarchive:
@@ -44,3 +40,8 @@
       register: ps
     
     - debug: msg="{{ ps.stdout }}"
+
+    - name: Clean up src folder
+      file: state=absent path={{ java_archive }}
+
+  when: java_installed.stdout == ""
